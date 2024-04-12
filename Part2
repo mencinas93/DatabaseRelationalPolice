@@ -1,30 +1,26 @@
-
-DROP TABLE IF EXISTS Police_Relational.Officers_Skills CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Detective_Assigned_Headquarters CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Officer_Assigned_Station CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Court CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Speciality CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Rank CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Officers CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Offenders CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Citations CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Offenses CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Firearms CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Tasers CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Body_Cameras CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Vehicles CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Headquarters CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Stations CASCADE;
-DROP TABLE IF EXISTS Police_Relational.Skill CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Officers_Skills CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Officer_Assigned_Location CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Rank CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Speciality CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Citations CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Offenders CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Court CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Officers CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Skill CASCADE;
+DROP TABLE IF EXISTS Police_Extended.Police_Location CASCADE;
 
 
 
-CREATE SCHEMA Police_Relational;
-SET search_path TO Police_Relational;
-
+CREATE SCHEMA Police_Extended;
+SET search_path TO Police_Extended;
 
 
 CREATE TYPE StationType AS ENUM ('Station', 'Headquarters');
+
+CREATE TYPE Offense AS (
+    category varchar(30),
+    offense_name varchar(30)
+);
 
 
 create table Police_Location (
@@ -40,19 +36,15 @@ create table Police_Location (
 
 
 
-create table Citations
-(
+CREATE TABLE Citations (
     Citation_ID serial PRIMARY KEY,
-    Offenses Jsonb[],   /*offense type, offense name*/
+    Offense Offense[],
     Date_Crime_Occurred DATE,
-    Time_Crime_Occurred timestamp,
-    Crime_Address varchar(30),
-    City_Crime_Occurred varchar(30),
-    State_Crime_Occurred char(2),
-
-
+    Time_Crime_Occurred TIMESTAMP,
+    Crime_Address VARCHAR(30),
+    City_Crime_Occurred VARCHAR(30),
+    State_Crime_Occurred CHAR(2)
 );
-
 
 
 Create table Offenders
@@ -91,10 +83,6 @@ create table Officers
     City varchar(20),
     State char(2),
     Date_Of_Birth Date not null,
-    Body_Camera_ID smallint,
-    Vehicle_ID smallint,
-    Taser_Serial_Number char(7),
-    Firearm_Serial_Number char(7),
     Citation_ID smallint,
     
     Taser_Serial_Number CHAR(7) UNIQUE NOT NUll,
@@ -119,7 +107,7 @@ create table Officers
     Registration_State char(2) not null,
     Registration_Expires Date,
     CONSTRAINT CHK_Vehicle_PlateYearMakeModel CHECK (Plate_Number IS NOT NULL AND 
-    Car_Year IS NOT NULL AND Make_and_Model IS NOT NULL)
+    Car_Year IS NOT NULL AND Make_and_Model IS NOT NULL),
 
     constraint FK_Officer_Citation
     FOREIGN KEY (Citation_ID) REFERENCES Citations(Citation_ID)
@@ -132,8 +120,9 @@ create table Officers
     constraint UC_OFFICERS_BodyCamera UNIQUE (Body_Camera_ID),
     constraint UC_OFFICERS_Vehicle UNIQUE (Vehicle_ID),
     constraint UC_OFFICERS_Taser UNIQUE (Taser_Serial_Number),
-    constraint UC_OFFICERS_Firearm UNIQUE (Firearm_Serial_Number),
+    constraint UC_OFFICERS_Firearm UNIQUE (Firearm_Serial_Number)
     );
+
 
 create table Rank
 (
