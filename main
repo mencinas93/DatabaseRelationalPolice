@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS Police_Relational.Officers_Skills CASCADE;
 DROP TABLE IF EXISTS Police_Relational.Detective_Assigned_Headquarters CASCADE;
 DROP TABLE IF EXISTS Police_Relational.Officer_Assigned_Station CASCADE;
